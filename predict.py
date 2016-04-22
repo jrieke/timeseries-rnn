@@ -17,15 +17,16 @@ print "Reading files from", data_dir
 
 for filename in filenames:
     ts = np.genfromtxt(os.path.join(data_dir, filename))
+    if ts.ndim == 1:  # csv file has only one column, ie one variable
+        ts = ts[:, np.newaxis]
     timeseries.append(ts)
 timeseries = np.array(timeseries)
 if change:
     timeseries = np.diff(timeseries, axis=1)
 
+
 # TODO: Check that all time series have the same number of timesteps and dimensions
-num_timeseries = len(timeseries)
-num_timesteps = len(timeseries[0])
-num_dims = len(timeseries[0][0])
+num_timeseries, num_timesteps, num_dims = timeseries.shape
 
 print "Read {} time series with {} time steps and {} dimensions".format(num_timeseries, num_timesteps, num_dims)
 
@@ -87,5 +88,5 @@ predicted = predicted.transpose((1, 0, 2))
 predicted = denormalize(predicted)
 for i, pred in enumerate(predicted):
 	if change:
-		pred = np.append(np.zeros((1, 3)), np.cumsum(pred, axis=0), axis=0)
+		pred = np.append(np.zeros((1, num_dims)), np.cumsum(pred, axis=0), axis=0)
 	np.savetxt('{}/{}.dat'.format(predicted_dir, i), pred)

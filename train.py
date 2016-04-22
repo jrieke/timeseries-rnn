@@ -29,6 +29,8 @@ print "Reading files from", data_dir
 
 for filename in filenames:
     ts = np.genfromtxt(os.path.join(data_dir, filename))
+    if ts.ndim == 1:  # csv file has only one column, ie one variable
+        ts = ts[:, np.newaxis]
     timeseries.append(ts)
 timeseries = np.array(timeseries)
 if args.change:
@@ -36,11 +38,10 @@ if args.change:
 
 
 # TODO: Check that all time series have the same number of timesteps and dimensions
-num_timeseries = len(timeseries)
-num_timesteps = len(timeseries[0])
-num_dims = len(timeseries[0][0])
+num_timeseries, num_timesteps, num_dims = timeseries.shape
 
 print "Read {} time series with {} time steps and {} dimensions".format(num_timeseries, num_timesteps, num_dims)
+
 
 # TODO: Save this somewhere so we can reuse it in prediction and generation.
 means = np.mean(timeseries, axis=(0, 1))
@@ -59,6 +60,9 @@ def denormalize(x):
 
 timeseries = normalize(timeseries)
 np.savetxt('out.txt', timeseries, fmt='%s')
+
+
+print timeseries
 
 
 print "Building network... (this can take a while)"
