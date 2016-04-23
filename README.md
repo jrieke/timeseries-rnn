@@ -6,25 +6,34 @@ The code is based on [keras](http://keras.io/) and [Theano](http://deeplearning.
 
 ## Usage
 
-`python train.py data/stocks`
 
-Train the network on all CSV files in `data/stocks`. Each file should contain one time series and look like this: 
+### Training
+
+	python train.py data/stocks
+
+Train the network on all files in `data/stocks`. Each file should contain one time series and look like this: 
 
 	1 2
 	3 4
 	5 6
 
-Columns are variables (here: 2) and rows are time steps (here: 3). The data is automatically normalized to mean 0 and standard deviation 1. The trained network is saved in `model`. 
+Columns are variables (here: 2) and rows are time steps (here: 3). The data is automatically normalized to mean 0 and standard deviation 1. If you want to train on the change of the data from time step to time step (this is recommended for time series that continually in- or decrease, e.g. stock prices), use `--change`. The trained network is saved in `model`. 
+
+Note that the network architecture (namely the Gaussian mixture model layer) is quite prone to numeric errors. If you encounter a `nan` loss during training, try to reduce the learning rate (`--learning_rate VALUE`, default 0.001), use more standard deviations to normalize the data (`--stds VALUE`, default 1), or play around with the number of Gaussians in the mixture distribution (`--mixture_components VALUE`, default 10).
 
 
-`python predict.py data/stocks`
+### Prediction
 
-Use the saved model to predict the next values in the time series for all CSV files in `data/stocks`. The predicted time series are stored in CSV format in the directory `predicted`. 
+	python predict.py data/stocks
+
+Use the saved model to predict the next values in the time series for all files in `data/stocks`. The predicted time series are stored in the format above in the directory `predicted`. 
 
 
-`python generate.py data/stocks`
+### Generation
 
-Use the saved model to generate completely new time series. Parts of the CSV files in `data/stocks` are used as seeds to initialize the network state. The generated time series are stored in CSV format in the directory `predicted`. 
+	python generate.py data/stocks
+
+Use the saved model to generate completely new time series. Parts of the CSV files in `data/stocks` are used as seeds to initialize the network state. The generated time series are stored in the format above in the directory `predicted`. 
 
 
 ## Requirements
